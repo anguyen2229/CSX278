@@ -13,16 +13,24 @@
 - [Mozilla Developer Network: the DOM](https://developer.mozilla.org/en-US/docs/Web/API/Document_Object_Model/Introduction/)
 - [Eloquent JavaScript](http://eloquentjavascript.net/)
 
+## Pre-Class Assignment
+
+To verify that you have downloaded everything before class, use the command `node –v` and fill out the following [form](https://docs.google.com/a/vanderbilt.edu/forms/d/e/1FAIpQLSd6R25o04TA2Z9MfowATtHjJ_FbgfBjXwexXzLfBrxOD7Xkwg/viewform?c=0&w=1) with the output of the command.
+
+Also, make sure that you can still run the JHipster application from assignment 1. Make the security changes (look in Security section)
+
 ## Installation
 
 - JHipster already installed and configured from previous tutorial
-  - Follow [these instructions](http://stackoverflow.com/questions/36142155/cors-origin-spring-boot-jhipster) to make sure that CORS is disabled for JHipster
 - You’ll need an http server installed to run this application
   - Install [Node.js](https://nodejs.org/en/) (THE LATEST VERSION), then open up a terminal and run `npm install -g http-server`. This will download and install an http server you can use for this tutorial.
-- Make a directory for the application and run `http-server -p 9090` in that directory to start serving files on localhost:9090
+- Sync your class folder to get the latest version of Assignment 6. Once you've updated the folder, cd to the Asgn6 directory and run `npm install` to install the various prerequisites. 
+- Run `http-server -p 9090` in that directory to start serving files on localhost:9090
+  - This should make `index.html` available at `localhost:9090` in your web browser.
   - **THIS IS IMPORTANT! JHipster runs on 8080 so our React app will have to run on a different port.**
 
 ### Downloading and Installing Webstorm
+
 *If you already have an IDE that you use for Javascript, no need to download WebStorm. If you don’t want to download an IDE solely for this assignment, feel free to use a text editor*
 
 1. Go to [https://www.jetbrains.com/webstorm/](https://www.jetbrains.com/webstorm/) and click download in the upper right corner
@@ -35,41 +43,66 @@
   - If you already use Jet Brains products, your license should automatically transfer over and WebStorm will open with no issues
   - If you don’t have a Jet Brains account, you’ll need to get a classroom license by visiting [https://www.jetbrains.com/shop/eform/students](https://www.jetbrains.com/shop/eform/students) and entering your vanderbilt email
 
+## Changes to JHipster
+
+- Go to the `SecurityConfiguration.java` file in your JHipster project (found in `/src/main/java/com/theNameYouChose/jhipster/config`) and change the `configure (HttpSecurity  http)` method so reads as the following:
+
+```java
+@Override
+    protected void configure(HttpSecurity http) throws Exception {
+        http
+            .csrf().disable()
+            .authorizeRequests().anyRequest().permitAll();
+    }
+```
+
+- Go to the `application.yml` file (in `/src/main/resources/config`) and uncomment the following:
+
+```
+cors: #By default CORS are not enabled. Uncomment to enable.
+        allowed-origins: "*"
+        allowed-methods: GET, PUT, POST, DELETE, OPTIONS
+        allowed-headers: "*"
+        exposed-headers:
+        allow-credentials: true
+        max-age: 1800
+```
+
+- Run `npm i` and `npm build` 
+
 ## Specifications
 
 - The finished app should interact with a preexisting JHipster server to perform Create/ Read/ Update/ Destroy operations on the underlying database.
-- Data from JHipster will be formatted as an array of JSON objects (each representing one student), as follows:
+For simplicity, we'll only cover Read (GET) and Create (POST) operations in this assignment.
+- We'll only interact with the Dormitory API from Assignment 1, at the path `/api/dormitory`.
 
 ```json
-[ {
- "id" : 1,
- "fullName" : "Harrison Stall",
- "emailAddress" : "hstall2529",
- "phoneNumber" : "8645461688",
- "graduationDate" : "2018-05-11",
- "preferredcontact" : {
-   "id" : 3,
-   "nameOfChoice" : "Facebook"
- },
- "school" : {
-   "id" : 1,
-   "schoolName" : "Engineering"
- },
- "dorm" : {
-   "id" : 2,
-   "dormName" : "Off-campus"
- }
-} ]
+[
+  { "id": 0, "dormName": "TestDorm" }
+]
 ```
 
-- This should give you a good idea of which fields you’ll need to add to the React application. Specifically, make sure you can read and write to the `fullName`, `emailAddress`, `phoneNumber`, `graduationDate`, `preferredcontact`, `school`, and `dorm` fields.
-- The application should consist of two screens: one for getting a list of all students, and one for adding a new student to the database. Two buttons will be used for switching between them.
-- For reference, here’s our standard application: 
+- This should give you a good idea of which fields you’ll need to add to the React application.
+  - Keep in mind that the `id` field will be populated automatically. Therefore, you'll only need to fill in a "dormName" field for POST requests.
+- The application will consist of two screens: on one, you can enter the name of a dorm and POST it to the API; on the second, you'll GET a list of all dorms.
+- We’ve provided skeleton code for most of the application. You are responsible for creating POST requests and creating a table in HTML following a GET request.
+  - Hint: this method should return JSX that React can use to create a table.
 
-![image of app](http://i.imgur.com/n9hEXQQ.png)
+For reference, here's our implementation:
 
+![reference](http://i.imgur.com/REjWWEB.png)
 
+## Completing the assignment
 
+Look at the `.createClass()` functions in the `AllDormitories.js` and `AddDormitory.js` files and add your code to the return method.
+There's also a single item to do in `App.js`.
+We've added `//TODO` statements to indicate where you should make changes.
+
+**To run the application, first run `npm script build`.** This will package the various JS files together to be served to the web browser.
+Once this is done, kill/ restart the HTTP server (`http-server -p 9090`) and reload the web page.
+Also, make sure that JHipster is running so that you have an API to interact with.
+
+Run the application, verify that things work, and push the results to your repository.
 
 ## Acknowledgement
 
@@ -79,11 +112,11 @@ The date of publication/ last update for each resource was checked to ensure tha
 
 ## Team Members
 
-- Santaguida,John S
-- Stahl,Joseph
-- Stall,Harrison R
-- Weitendorf,Frederick D
-- Yeonas,Victoria Trent
-- Roth,Brittany D
-- Kanai,Yoko M
+- Santaguida, John S
+- Stahl, Joseph
+- Stall, Harrison R
+- Weitendorf, Frederick D
+- Yeonas, Victoria Trent
+- Roth, Brittany D
+- Kanai, Yoko M
 - Weber, Betsy
